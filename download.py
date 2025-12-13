@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 # 配置
 DOWNLOAD_DIR = '/root/autodl-tmp/'  # 下载目录
-CLOUD_PATH = ['来自分享']  # 云盘目录路径
+CLOUD_PATH = []  # 云盘目录路径，空表示根目录（转存后文件放根目录）
 FILES_TO_DOWNLOAD = [
     'DIV2K_train_HR.zip',
     'DIV2K_valid_HR.zip',
@@ -76,21 +76,23 @@ def main():
     for name, did in drives.items():
         print(f"   - {name}: {did}")
     
-    # 遍历所有盘，找到包含WorkData的盘
-    drive_id = None
-    target_folder = CLOUD_PATH[0]  # WorkData
-    for name, did in drives.items():
-        print(f"\n📂 检查 {name} 盘 (drive_id={did}):")
-        file_list = ali.get_file_list(parent_file_id='root', drive_id=did)
-        for f in file_list:
-            print(f"   - {f.name} ({f.type})")
-            if f.name == target_folder and f.type == 'folder':
-                drive_id = did
-                print(f"   ✅ 找到 {target_folder}!")
-    
+    # 选择第一个可用的盘
+    drive_id = list(drives.values())[0] if drives else None
     if not drive_id:
-        print(f"\n❌ 所有盘中都未找到 {target_folder} 目录")
+        print("\n❌ 未找到可用的盘")
         return
+    
+    # 如果有CLOUD_PATH，遍历所有盘找到包含目标文件夹的盘
+    if CLOUD_PATH:
+        target_folder = CLOUD_PATH[0]
+        for name, did in drives.items():
+            print(f"\n📂 检查 {name} 盘 (drive_id={did}):")
+            file_list = ali.get_file_list(parent_file_id='root', drive_id=did)
+            for f in file_list:
+                print(f"   - {f.name} ({f.type})")
+                if f.name == target_folder and f.type == 'folder':
+                    drive_id = did
+                    print(f"   ✅ 找到 {target_folder}!")
     
     print(f"\n📀 使用 drive_id: {drive_id}")
     
