@@ -16,11 +16,17 @@ FILES_TO_DOWNLOAD = [
     'DIV2K_valid_HR.zip',
 ]
 
-def get_resource_drive_id(ali):
-    """获取资源盘drive_id"""
+def get_all_drive_ids(ali):
+    """获取所有可用的drive_id"""
     user = ali.get_user()
-    # 优先使用资源盘，没有则用默认盘
-    return getattr(user, 'resource_drive_id', None) or user.default_drive_id
+    drives = {}
+    if hasattr(user, 'default_drive_id') and user.default_drive_id:
+        drives['default'] = user.default_drive_id
+    if hasattr(user, 'backup_drive_id') and user.backup_drive_id:
+        drives['backup'] = user.backup_drive_id
+    if hasattr(user, 'resource_drive_id') and user.resource_drive_id:
+        drives['resource'] = user.resource_drive_id
+    return drives
 
 def navigate_to_folder(ali, path_parts, drive_id=None):
     """导航到指定目录，返回目录ID"""
@@ -64,12 +70,29 @@ def main():
     ali = Aligo()
     print(f"✅ 登录成功")
     
-    # 获取资源盘ID
-    drive_id = get_resource_drive_id(ali)
-    print(f"📀 使用资源盘 drive_id: {drive_id}")
+    # 获取所有drive_id并列出每个盘的内容
+    drives = get_all_drive_ids(ali)
+    print(f"\n📀 可用的盘:")
+    for name, did in drives.items():
+        print(f"   - {name}: {did}")
     
-    # 先列出根目录帮助确认结构
-    list_root_folders(ali, drive_id)
+    # 遍历所有盘，找到包含WorkData的盘
+    drive_id = None
+    target_folder = CLOUD_PATH[0]  # WorkData
+    for name, did in drives.items():
+        print(f"\n📂 检查 {name} 盘 (drive_id={did}):")
+        file_list = ali.get_file_list(parent_file_id='root', drive_id=did)
+        for f in file_list:
+            print(f"   - {f.name} ({f.type})")
+            if f.name == target_folder and f.type == 'folder':
+                drive_id = did
+                print(f"   ✅ 找到 {target_folder}!")
+    
+    if not drive_id:
+        print(f"\n❌ 所有盘中都未找到 {target_folder} 目录")
+        return
+    
+    print(f"\n📀 使用 drive_id: {drive_id}")
     
     # 创建下载目录
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
