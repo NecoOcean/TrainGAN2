@@ -16,13 +16,19 @@ FILES_TO_DOWNLOAD = [
     'DIV2K_valid_HR.zip',
 ]
 
-def navigate_to_folder(ali, path_parts):
+def get_resource_drive_id(ali):
+    """获取资源盘drive_id"""
+    user = ali.get_user()
+    # 优先使用资源盘，没有则用默认盘
+    return getattr(user, 'resource_drive_id', None) or user.default_drive_id
+
+def navigate_to_folder(ali, path_parts, drive_id=None):
     """导航到指定目录，返回目录ID"""
     parent_id = 'root'
     
     for folder_name in path_parts:
         print(f"   进入目录: {folder_name}")
-        file_list = ali.get_file_list(parent_file_id=parent_id)
+        file_list = ali.get_file_list(parent_file_id=parent_id, drive_id=drive_id)
         
         found = False
         for f in file_list:
@@ -41,10 +47,10 @@ def navigate_to_folder(ali, path_parts):
     
     return parent_id
 
-def list_root_folders(ali):
+def list_root_folders(ali, drive_id=None):
     """列出根目录所有文件夹"""
-    print("\n📂 根目录内容:")
-    file_list = ali.get_file_list(parent_file_id='root')
+    print(f"\n📂 根目录内容 (drive_id={drive_id}):")
+    file_list = ali.get_file_list(parent_file_id='root', drive_id=drive_id)
     for f in file_list:
         print(f"   - {f.name} ({f.type})")
     return file_list
@@ -58,15 +64,19 @@ def main():
     ali = Aligo()
     print(f"✅ 登录成功")
     
+    # 获取资源盘ID
+    drive_id = get_resource_drive_id(ali)
+    print(f"📀 使用资源盘 drive_id: {drive_id}")
+    
     # 先列出根目录帮助确认结构
-    list_root_folders(ali)
+    list_root_folders(ali, drive_id)
     
     # 创建下载目录
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
     
     # 导航到云盘目录
     print(f"\n📂 定位目录: /{'/'.join(CLOUD_PATH)}")
-    folder_id = navigate_to_folder(ali, CLOUD_PATH)
+    folder_id = navigate_to_folder(ali, CLOUD_PATH, drive_id)
     
     if not folder_id:
         print("\n❌ 无法找到云盘目录，请检查 CLOUD_PATH 配置")
@@ -74,7 +84,7 @@ def main():
     
     # 获取目录下所有文件
     print(f"\n📋 列出目录文件:")
-    file_list = ali.get_file_list(parent_file_id=folder_id)
+    file_list = ali.get_file_list(parent_file_id=folder_id, drive_id=drive_id)
     file_map = {}
     for f in file_list:
         print(f"   - {f.name}")
