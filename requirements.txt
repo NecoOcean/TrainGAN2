@@ -1,0 +1,27 @@
+# MindSpore GAN Project Dependencies
+# Python 3.9.25 compatible
+# Install: pip install -r requirements.txt
+
+# ============== Core ==============
+numpy>=1.21.0,<2.0.0          # MindSpore 2.2.14 requires numpy<2.0
+pillow>=9.0.0,<11.0.0         # Image processing (Resampling API needs >=9.1)
+
+# ============== Image Processing ==============
+opencv-python>=4.5.0          # Image read/write, preprocessing
+scikit-image>=0.19.0          # PSNR, SSIM metrics
+
+# ============== Visualization ==============
+matplotlib>=3.5.0             # Training curves, image display
+tqdm>=4.64.0                  # Progress bar
+
+# ============== Jupyter (Optional) ==============
+jupyter>=1.0.0                # Run notebooks
+ipykernel>=6.0.0              # Jupyter kernel
+
+# ============== MindSpore ==============
+# MindSpore 2.2.14 CPU version - Install from local wheel:
+# pip install mindspore-2.2.14-cp39-cp39-win_amd64.whl --no-cache-dir
+#
+# Or download from official:
+# Windows CPU: https://ms-release.obs.cn-north-4.myhuaweicloud.com/2.2.14/MindSpore/unified/x86_64/mindspore-2.2.14-cp39-cp39-win_amd64.whl
+# Linux GPU (CUDA 11.6): pip install mindspore==2.2.14 -i https://pypi.tuna.tsinghua.edu.cn/simple

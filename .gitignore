@@ -1,0 +1,47 @@
+# ============== 数据集 ==============
+# 忽略所有图片数据集
+data/
+
+# ============== 训练输出 ==============
+ckpt_sr/
+output_sr/
+*.ckpt
+
+# ============== 大文件 ==============
+*.zip
+*.whl
+*.tar.gz
+
+# ============== Python ==============
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# ============== Jupyter ==============
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ============== IDE ==============
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ============== 系统 ==============
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============== 临时文件 ==============
+*.log
+*.tmp
+.ask_continue_port
+
+# ============== 文档文件 ==============
+docs/
