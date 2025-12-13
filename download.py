@@ -10,10 +10,36 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 # 配置
 DOWNLOAD_DIR = '/root/autodl-tmp/'  # 下载目录
+CLOUD_PATH = ['WorkData', 'Datasets', 'DIV2K']  # 云盘目录路径
 FILES_TO_DOWNLOAD = [
     'DIV2K_train_HR.zip',
     'DIV2K_valid_HR.zip',
 ]
+
+def navigate_to_folder(ali, path_parts):
+    """导航到指定目录，返回目录ID"""
+    parent_id = 'root'
+    
+    for folder_name in path_parts:
+        print(f"   进入目录: {folder_name}")
+        file_list = ali.get_file_list(parent_file_id=parent_id)
+        
+        found = False
+        for f in file_list:
+            if f.name == folder_name and f.type == 'folder':
+                parent_id = f.file_id
+                found = True
+                break
+        
+        if not found:
+            # 列出当前目录内容帮助调试
+            print(f"   ❌ 未找到文件夹: {folder_name}")
+            print(f"   当前目录内容:")
+            for f in file_list[:10]:
+                print(f"      - {f.name} ({f.type})")
+            return None
+    
+    return parent_id
 
 def main():
     print("=" * 50)
@@ -27,36 +53,31 @@ def main():
     # 创建下载目录
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
     
+    # 导航到云盘目录
+    print(f"\n📂 定位目录: /{'/'.join(CLOUD_PATH)}")
+    folder_id = navigate_to_folder(ali, CLOUD_PATH)
+    
+    if not folder_id:
+        print("\n❌ 无法找到云盘目录，请检查 CLOUD_PATH 配置")
+        return
+    
+    # 获取目录下所有文件
+    print(f"\n📋 列出目录文件:")
+    file_list = ali.get_file_list(parent_file_id=folder_id)
+    file_map = {}
+    for f in file_list:
+        print(f"   - {f.name}")
+        file_map[f.name] = f
+    
     # 下载文件
     for filename in FILES_TO_DOWNLOAD:
-        print(f"\n🔍 搜索: {filename}")
+        print(f"\n🔍 查找: {filename}")
         
-        # 全盘搜索（去掉扩展名搜索更容易匹配）
-        search_name = filename.replace('.zip', '')
-        files = ali.search_file(search_name)
-        
-        print(f"   搜索关键词: {search_name}")
-        print(f"   找到 {len(files) if files else 0} 个结果")
-        
-        if files:
-            for i, f in enumerate(files[:5]):  # 显示前5个结果
-                print(f"   [{i}] {f.name}")
-        
-        if not files:
-            print(f"❌ 未找到文件: {filename}")
-            print(f"   请尝试在云盘中搜索确认文件名")
+        if filename not in file_map:
+            print(f"❌ 目录中未找到: {filename}")
             continue
         
-        # 精确匹配文件名
-        file = None
-        for f in files:
-            if f.name == filename:
-                file = f
-                break
-        
-        if not file:
-            file = files[0]  # 使用第一个结果
-        
+        file = file_map[filename]
         print(f"📁 找到: {file.name} (ID: {file.file_id})")
         print(f"📥 开始下载到: {DOWNLOAD_DIR}")
         
