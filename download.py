@@ -41,6 +41,14 @@ def navigate_to_folder(ali, path_parts):
     
     return parent_id
 
+def list_root_folders(ali):
+    """列出根目录所有文件夹"""
+    print("\n📂 根目录内容:")
+    file_list = ali.get_file_list(parent_file_id='root')
+    for f in file_list:
+        print(f"   - {f.name} ({f.type})")
+    return file_list
+
 def main():
     print("=" * 50)
     print("阿里云盘数据集下载工具")
@@ -49,6 +57,9 @@ def main():
     # 登录（首次需扫码）
     ali = Aligo()
     print(f"✅ 登录成功")
+    
+    # 先列出根目录帮助确认结构
+    list_root_folders(ali)
     
     # 创建下载目录
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
