@@ -10,7 +10,11 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 # 配置
 DOWNLOAD_DIR = '/root/autodl-tmp/'  # 下载目录
+<<<<<<< HEAD
 CLOUD_PATH = []  # 云盘目录路径，空表示根目录（转存后文件放根目录）
+=======
+CLOUD_PATH = ['来自分享']  # 云盘目录路径
+>>>>>>> 16cec18fd2d0d8b63ad47798c5e455240f6c3ebb
 FILES_TO_DOWNLOAD = [
     'DIV2K_train_HR.zip',
     'DIV2K_valid_HR.zip',
