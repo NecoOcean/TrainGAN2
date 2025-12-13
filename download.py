@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 # 配置
 DOWNLOAD_DIR = '/root/autodl-tmp/'  # 下载目录
-CLOUD_PATH = ['WorkData', 'Datasets', 'DIV2K']  # 云盘目录路径
+CLOUD_PATH = ['来自分享']  # 云盘目录路径
 FILES_TO_DOWNLOAD = [
     'DIV2K_train_HR.zip',
     'DIV2K_valid_HR.zip',
