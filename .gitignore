@@ -42,6 +42,7 @@ desktop.ini
 *.log
 *.tmp
 .ask_continue_port
+.windsurfrules
 
 # ============== 文档文件 ==============
 docs/
