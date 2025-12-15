@@ -4,6 +4,7 @@ data/
 
 # ============== 训练输出 ==============
 ckpt_sr/
+ckpt_sr_stage2
 output_sr/
 *.ckpt
 
